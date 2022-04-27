@@ -13,7 +13,7 @@ const create = async (req, res) => {
       { $push: { posts: post }}
     )
     return res.status(201).json(post)
-    
+
   } catch (err) {
     return res.status(500).json(err)
   }
@@ -105,6 +105,19 @@ const markCommentAsSolution = async (req, res) => {
   }
 }
 
+const deleteComment = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+    post.comments.remove({ _id: req.params.commentId })
+
+    await post.save()
+    return res.status(204).end()
+    
+  } catch (err) {
+    return res.status(500).json(err)
+  }
+}
+
 export {
   // Post Controllers
   create,
@@ -114,5 +127,6 @@ export {
   deletePost as delete,
   // Comment Controllers
   createComment,
-  markCommentAsSolution
+  markCommentAsSolution,
+  deleteComment
 }
