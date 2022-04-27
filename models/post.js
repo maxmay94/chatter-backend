@@ -16,7 +16,6 @@ const commentSchema = new Schema({
       default: false
     },
     commenter: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
-    comments: [commentSchema],
 }, {timestamps: true} )
 
 const postSchema = new Schema({
@@ -29,12 +28,13 @@ const postSchema = new Schema({
     required: false
   },
   is_resolved: {
-    type: Boolean.apply,
+    type: Boolean,
     default: false
   },
-  added_by:{ type: mongooseSchema.Types.ObjectId, ref: 'Profile' }
-
+  added_by:{ type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
+  comments: [commentSchema],
 }, { timestamps: true })
+
 
 const Post = mongoose.model('Post', postSchema)
 
