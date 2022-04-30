@@ -5,7 +5,7 @@ const profileSchema = new mongoose.Schema({
   name: String,
   avatar: {
     type: String,
-    required: true,
+    required: false,
   },
   posts: [
     {
