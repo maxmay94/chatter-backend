@@ -50,9 +50,8 @@ const update = async (req, res) => {
       req.params.id,
       updateData,
       { new: true }
-    )
+    ).populate('added_by') // <= add a populate method here
     return res.status(200).json(updatedPost)
-
   } catch (err) {
     return res.status(500).json(err)
   }
@@ -79,21 +78,27 @@ const createComment = async (req, res) => {
     post.comments.push(req.body)
     await post.save()
     const newComment = post.comments[post.comments.length - 1]
-    return res.status(201).json(newComment)
 
+    // Append temporary profile data directly to newComment
+    const profile = await Profile.findById(req.user.profile)
+    newComment.commenter = profile
+
+    return res.status(201).json(newComment)
   } catch (err) {
-    return res.status(500).json(err)
+    res.status(500).json(err)
   }
 }
 
 const markCommentAsSolution = async (req, res) => {
   try {
-    const updatedPost = await Post.findByIdAndUpdate(req.params.postId)
+    const updatedPost = await Post.findById(req.params.postId)
+      .populate('added_by')  // <= add a populate method here
+      .populate('comments.commenter')  // <= and here!
 
     const idx = updatedPost.comments.findIndex(
       (comment) => comment._id.equals(req.params.commentId)
     )
-    
+
     updatedPost.is_resolved = true
     updatedPost.comments[idx].is_solution = true
 
@@ -101,7 +106,7 @@ const markCommentAsSolution = async (req, res) => {
     return res.status(200).json(updatedPost)
 
   } catch (err) {
-    return res.status(500).json(err)
+    res.status(500).json(err)
   }
 }
 
